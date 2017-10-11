@@ -107,7 +107,6 @@ class App(QWidget):
             # used for users to play the game
             # condition = (x, y) in self.user.agent.visited
             # if not condition:
-            #     pass
             #     # res = self.user.result((x, y), 'click')
             # else:
             #     if (x, y) in self.user.agent.clues:
