@@ -21,19 +21,11 @@ class Map:
         while count > 0:
             x = randint(0,self.row-1)
             y = randint(0,self.col-1)
-            # this point is not a mine
-            # and its neighbours can not be all mines
-            # find an empty square
+            # this point is a mine, generate a random point again
             if map[x][y] != 0:
                 continue
-            flag = False
-            for xNei,yNei in self.neighbours((x,y)):
-                if map[xNei][yNei] != 9:
-                    flag = True
-                    break
-            if flag:
-                map[x][y] = 9
-                count = count - 1
+            map[x][y] = 9
+            count = count - 1
         for x in range(self.row):
             for y in range(self.col):
                 if map[x][y] != 9:
@@ -50,8 +42,6 @@ class Map:
                     nei.add((i,j))
         nei.discard((x,y))
         return nei
-
-
 
 # unit test
 m = Map(5,5,4)

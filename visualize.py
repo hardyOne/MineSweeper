@@ -1,6 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from user import User
 from generateMap import Map
 from time import sleep
@@ -10,13 +11,13 @@ import win32api, win32con
 class App(QWidget):
     def __init__(self):
         super().__init__()
-        map = Map(20,20,80)
+        map = Map(30, 30, 200)
         self.user = User(map.randomGenerate())
         self.row = self.user.row
         self.col = self.user.col
         self.maxSize = 750
-        self.buttonWidth = self.maxSize // max(self.row,self.col)
-        self.buttonHeight = self.maxSize // max(self.row,self.col)
+        self.buttonWidth = self.maxSize // max(self.row, self.col)
+        self.buttonHeight = self.maxSize // max(self.row, self.col)
         self.buttons = []
         self.title = 'MineSweeper'
         self.left = 50
@@ -28,6 +29,7 @@ class App(QWidget):
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setWindowIcon(QIcon('icon.jpg'))
         # set table row && col
         for i in range(self.row + 1):
             for j in range(self.col + 1):
@@ -46,7 +48,7 @@ class App(QWidget):
                 button.setObjectName(name)
                 button.setToolTip(name)
                 button.setStyleSheet('background-color:grey')
-                button.move(self.buttonWidth * j, self.buttonHeight * i)
+                button.move(self.buttonWidth * i, self.buttonHeight * j)
                 button.clicked.connect(self.on_click)
                 temp.append(button)
             self.buttons.append(temp)
@@ -69,23 +71,46 @@ class App(QWidget):
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
 
-    def play(self):
-        while True:
-            (x, y) = self.user.agent.nextClick()
-            res = self.user.result((x, y))
-            self.click((x,y))
-            if res == 'FAILURE' or res == 'SUCCESS':
-                for x,y in self.user.agent.mines:
-                    self.buttons[x][y].setStyleSheet('background-color:indigo')
-                break
+    def play(self, simulateClick=False):
+        if simulateClick:
+            while True:
+                (x, y) = self.user.agent.nextClick()
+                res = self.user.result((x, y))
+                if res == 'FAILURE' or res == 'SUCCESS':
+                    break
+                self.click((x, y))
+        else:
+            while True:
+                (x, y) = self.user.agent.nextClick()
+                res = self.user.result((x, y))
+                button = self.buttons[x][y]
+                button.setText(str(self.user.map[x][y]))
+                button.setStyleSheet('background-color:white')
+                if self.user.map[x][y] == 0:  # empty squares
+                    button.setText('')
+                elif self.user.map[x][y] == 9:  # booms
+                    button.setStyleSheet('background-color:yellow')
+                else:  # clues
+                    button.setStyleSheet('background-color:orange')
+                if res == 'FAILURE':
+                    button.setText('T')
+                    for fakeMineX,fakeMineY in self.user.agent.mines - self.user.mines:
+                        self.buttons[fakeMineX][fakeMineY].setText('F')
+                    break
+                if res == 'SUCCESS':
+                    break
+            # display the mines marked by agent
+            for (mineX, mineY) in self.user.agent.mines:
+                self.buttons[mineX][mineY].setStyleSheet('background-color:yellow')
 
     @pyqtSlot()
     def on_click(self):
+        self.play(True)
         '''
         this function is used to monitor click event
         :return: nothing to return
         '''
-        sleep(0.01) # used for people to see phenomenon
+        # sleep(0.001)  # used for people to see phenomenon
         # to get which button triggers this click event
         senderButton = self.sender()
         name = senderButton.objectName()
@@ -95,27 +120,16 @@ class App(QWidget):
         button = self.buttons[x][y]
         button.setText(str(self.user.map[x][y]))
         button.setStyleSheet('background-color:white')
-        if self.user.map[x][y] == 0: # empty squares
+        if self.user.map[x][y] == 0:  # empty squares
             button.setText('')
-        elif self.user.map[x][y] == 9: # booms
+        elif self.user.map[x][y] == 9:  # booms
             button.setStyleSheet('background-color:yellow')
-        else: # clues
+        else:  # clues
             button.setStyleSheet('background-color:orange')
-        if (x,y) in self.user.agent.clues:
-            pass
-            # print((x,y),self.user.agent.clues[(x,y)]['neighbours'])
-            # used for users to play the game
-            # condition = (x, y) in self.user.agent.visited
-            # if not condition:
-            #     # res = self.user.result((x, y), 'click')
-            # else:
-            #     if (x, y) in self.user.agent.clues:
-            #         nei = self.user.agent.clues[(x, y)]['neighbours']
-            #         print((x, y))
-            #         print('len:', len(nei))
-            #         print(nei)
-            #     else:
-            #         print('not in clues')
+        # agent mark fake mines, display them
+        if (x,y) in self.user.agent.mines and (x,y) not in self.user.mines:
+            button.setStyleSheet('background-color:red')
+
 
 
 if __name__ == '__main__':
