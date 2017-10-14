@@ -29,12 +29,12 @@ It's obvious that the agent may have kinds of faults that cause it to lose the g
 * Squares with **WHITE** color and **NO TEXT** represents that this is an empty square(with clue number 0).
 ### The percentage of mines is 0.11(100 mines)
 **success screenshot**
-![30_30_100 0 11 _success](https://user-images.githubusercontent.com/30862009/31573331-7a3968fe-b087-11e7-9605-9150a4392ef5.png)
+![30_30_100 0 11 _success](https://user-images.githubusercontent.com/30862009/31573331-7a3968fe-b087-11e7-9605-9150a4392ef5.png)  
 **randomClick failure screenshot**
 ![30_30_100 0 11 _randomclick_failure](https://user-images.githubusercontent.com/30862009/31573339-ae74be3e-b087-11e7-8942-121b692fdeb1.png)
 ### The percentage of mines is 0.17(150 mines)
 **success screenshot**
-![30_30_150 0 17 _success](https://user-images.githubusercontent.com/30862009/31573342-c684b402-b087-11e7-82c9-e1861f2870f4.png)
+![30_30_150 0 17 _success](https://user-images.githubusercontent.com/30862009/31573342-c684b402-b087-11e7-82c9-e1861f2870f4.png)  
 **randomClick failure**
 ![30_30_150 0 17 _randomclick_failure](https://user-images.githubusercontent.com/30862009/31573346-d6bf069c-b087-11e7-844e-fed029452b0c.png)
 **markFakeMine failure**
