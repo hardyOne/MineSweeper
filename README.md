@@ -1,4 +1,4 @@
-# Mine
+# MineSweeper
 This is an agent to automatically detect all mines in a map consisting of clues and mines.
 ## There are 4 parts for this program.
 * Map: to generate a map consisting of clues and mines if given row, col and mines.
