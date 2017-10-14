@@ -1,6 +1,5 @@
 from random import randint
 
-
 class Agent:
     def __init__(self, row, col, user):
         self.row = row

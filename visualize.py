@@ -11,7 +11,7 @@ import win32api, win32con
 class App(QWidget):
     def __init__(self):
         super().__init__()
-        map = Map(30, 30, 200)
+        map = Map(30, 30, 250)
         self.user = User(map.randomGenerate())
         self.row = self.user.row
         self.col = self.user.col
@@ -19,7 +19,7 @@ class App(QWidget):
         self.buttonWidth = self.maxSize // max(self.row, self.col)
         self.buttonHeight = self.maxSize // max(self.row, self.col)
         self.buttons = []
-        self.title = 'MineSweeper'
+        self.title = 'MineSweeper' + '(' + str(self.row) + '*' + str(self.col) + ')'
         self.left = 50
         self.top = 50
         self.width = (self.row + 1) * self.buttonWidth
@@ -94,7 +94,7 @@ class App(QWidget):
                     button.setStyleSheet('background-color:orange')
                 if res == 'FAILURE':
                     button.setText('T')
-                    for fakeMineX,fakeMineY in self.user.agent.mines - self.user.mines:
+                    for fakeMineX, fakeMineY in self.user.agent.mines - self.user.mines:
                         self.buttons[fakeMineX][fakeMineY].setText('F')
                     break
                 if res == 'SUCCESS':
@@ -127,9 +127,8 @@ class App(QWidget):
         else:  # clues
             button.setStyleSheet('background-color:orange')
         # agent mark fake mines, display them
-        if (x,y) in self.user.agent.mines and (x,y) not in self.user.mines:
+        if (x, y) in self.user.agent.mines and (x, y) not in self.user.mines:
             button.setStyleSheet('background-color:red')
-
 
 
 if __name__ == '__main__':
