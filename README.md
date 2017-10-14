@@ -28,9 +28,9 @@ It's obvious that the agent may have kinds of faults that cause it to lose the g
 * Squares with **ORANGE** color and **NUMBER** represents that this clue square has been clicked by agent. 
 * Squares with **WHITE** color and **NO TEXT** represents that this is an empty square(with clue number 0).
 ### The percentage of mines is 0.11(100 mines)
-success screenshot
+**success screenshot**
 ![30_30_100 0 11 _success](https://user-images.githubusercontent.com/30862009/31573331-7a3968fe-b087-11e7-9605-9150a4392ef5.png)
-randomClick failure screenshot
+**randomClick failure screenshot**
 ![30_30_100 0 11 _randomclick_failure](https://user-images.githubusercontent.com/30862009/31573339-ae74be3e-b087-11e7-8942-121b692fdeb1.png)
 ### The percentage of mines is 0.17(150 mines)
 **success screenshot**
@@ -48,8 +48,8 @@ randomClick failure screenshot
 ![30_30_200 0 22 _markfakemine_failure2](https://user-images.githubusercontent.com/30862009/31573371-300a9144-b088-11e7-86a5-ff593eefc37f.png)
 ### The percentage of mines is 0.28(250 mines)
 **randomClick failure**
-![30_30_250 0 28 _randomclick_failure](https://user-images.githubusercontent.com/30862009/31573374-3e2600a6-b088-11e7-9318-25e24fc86c56.png)
-**Analysis:**
+![30_30_250 0 28 _randomclick_failure](https://user-images.githubusercontent.com/30862009/31573374-3e2600a6-b088-11e7-9318-25e24fc86c56.png)  
+### Analysis of these screenshots
 **As we can see, when p is small, the agent will sweeper all the mines with higher possibility, as the p goes up, the agent will do more calculations and has to deal with some uncentainty, and when p is high enough( higher than 0.25), the agent will hardly win the game because it's randomly click action will become dangerous.**
 ## How to run?
 * First, install all dependent packages.
