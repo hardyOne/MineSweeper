@@ -154,7 +154,7 @@ class App(QWidget):
         this function is used to monitor click event
         :return: nothing to return
         '''
-        sleep(0.1)  # used for people to see phenomenon
+        sleep(0.05)  # used for people to see phenomenon
         # to get which button triggers this click event
         senderButton = self.sender()
         name = senderButton.objectName()
@@ -167,12 +167,10 @@ class App(QWidget):
         if self.user.map[x][y] == 0:  # empty squares
             button.setText('')
         elif self.user.map[x][y] == 9:  # booms
-            button.setText('')
             button.setStyleSheet('background-color:yellow')
+            button.setText('')
             if (x,y) not in self.user.agent.mines:
-                button.setStyleSheet('F')
-            return
-
+                button.setText('T')
         else:  # clues
             button.setStyleSheet('background-color:orange')
         # agent mark fake mines, display them
