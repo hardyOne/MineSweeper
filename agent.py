@@ -26,11 +26,14 @@ class Agent:
         self.isFirst = True
         # for random operation
         self.randomPercentage = 0.35
+        # the sequence of click or mark
+        self.sequence = []
 
     def mark(self, point):
         # point is in mines
         if point in self.mines:
             return
+        self.sequence.append(point)
         print('mark', point, 'as a mine', len(self.mines))
         self.clues[point]['isMine'] = True
         # add this point to mines and visited set
@@ -54,6 +57,7 @@ class Agent:
         # exist safe squares
         if len(self.safe) != 0:
             for point in self.safe:
+                self.sequence.append(point)
                 return point
         # no safe squares left
         # case 1: mark mines to find safe squares
@@ -63,9 +67,12 @@ class Agent:
         # try another times to see if there exists a safe square
         if len(self.safe) != 0:
             for point in self.safe:
+                self.sequence.append(point)
                 return point
         # no safe squares. oops!!
-        return self.randomOperation()
+        rPoint = self.randomOperation()
+        self.sequence.append(rPoint)
+        return rPoint
 
     def randomOperation(self):
 
