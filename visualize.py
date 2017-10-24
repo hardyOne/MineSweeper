@@ -178,6 +178,7 @@ class App(QWidget):
             button.setStyleSheet('background-color:red')
 
     def reset(self):
+        print('------------------A new game----------------------------')
         self.p = random() / 10 + 0.2
         self.p =  0.2
         map = Map(self.row, self.col, self.p)

@@ -26,7 +26,7 @@ class Agent:
         # first first click
         self.isFirst = True
         # for random operation
-        self.randomPercentage = 0.35
+        self.randomPercentage = 0.3
         # the sequence of click or mark
         self.sequence = []
         # use rule 5
@@ -90,7 +90,9 @@ class Agent:
         # and for random, we have two strategies.
         # 1, we click squares outside the clue
         # 2, we mark squares near the clue
-        visitedPercentage = len(self.visited) / (self.row * self.col)
+        if len(self.unvisited) == 0:
+            return (-1, -1)
+        visitedPercentage = (len(self.clues) - len(self.unvisited)) / (len(self.unvisited))
         listUnvisited = list(self.unvisited)
         # click squares outside the clues randomly
         if visitedPercentage < self.randomPercentage:
@@ -202,7 +204,7 @@ class Agent:
                 lenOfMinesA = len(self.clues[point]['mines'])
                 lenOfMinesB = len(self.clues[nei]['mines'])
                 # case 3: num(A) > num(B) and A - B = num(A) - num(B)
-                if self.clues[point]['number'] > self.clues[nei]['number'] and len(A_B) == (numA - lenOfMinesA) - (
+                if numA - lenOfMinesA > numB - lenOfMinesB and len(A_B) == (numA - lenOfMinesA) - (
                             numB - lenOfMinesB):
                     for p in A_B:
                         print('According to', point, 'and', nei, 'I am sure that', p, 'as a mine')
