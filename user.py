@@ -1,5 +1,6 @@
 from agent import Agent
 from time import sleep
+from generateMap import Map
 
 
 class User:
@@ -38,6 +39,15 @@ class User:
         # update agent's clues
         self.agent.updateClues(point, self.map[x][y])
 
+    def play(self):
+        while True:
+            point = self.agent.nextClick()
+            res = self.result(point)
+            if res == 'SUCCESS' or res == 'FAILURE':
+                print(res)
+                break
+
 # unit test
-# map = loadMap('example.txt')
-# user = User(map)
+# map = Map(20,20,0.15)
+# user = User(map.randomGenerate())
+# user.play()

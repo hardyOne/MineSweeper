@@ -1,5 +1,6 @@
 from random import randint
 
+
 class Agent:
     def __init__(self, row, col, user):
         self.row = row
@@ -28,6 +29,8 @@ class Agent:
         self.randomPercentage = 0.35
         # the sequence of click or mark
         self.sequence = []
+        # use rule 5
+        self.rule5 = False
 
     def mark(self, point):
         # point is in mines
@@ -56,10 +59,13 @@ class Agent:
     def nextClick(self):
         # exist safe squares
         if len(self.safe) != 0:
+            self.rule5 = False
             for point in self.safe:
                 self.sequence.append(point)
                 return point
         # no safe squares left
+        # use rule 5
+        self.rule5 = True
         # case 1: mark mines to find safe squares
         # we try as we can to mark some square as mines
         for p in dict(self.clues):
@@ -134,7 +140,7 @@ class Agent:
         # so the agent should let the user know this condition
         listUnvisited = list(self.unvisited)
         if len(listUnvisited) == 0:
-            return (-1, -1) # this point is meaningless
+            return (-1, -1)  # this point is meaningless
         rNum = randint(0, len(listUnvisited) - 1)
         print('Finally rendomly generated', listUnvisited[rNum])
         return listUnvisited[rNum]
@@ -202,11 +208,26 @@ class Agent:
                         print('According to', point, 'and', nei, 'I am sure that', p, 'as a mine')
                         self.mark(p)
                 # case 4: A contains B and A(num) - A(mines) = B(num) - B(mine)
-                if A > B and (numA - lenOfMinesA) == (numB - lenOfMinesB):
+                elif A > B and (numA - lenOfMinesA) == (numB - lenOfMinesB):
                     for p in A_B:
                         if p in self.unvisited:
                             print('According to', point, 'and', nei, 'I am sure that', p, 'is safe')
                             self.safe.add(p)
+                # case 5: involves 3 clue squares
+                elif self.rule5 and (numA - lenOfMinesA) > (numB - lenOfMinesB):
+                    for anotherNei in self.extenedAllNeighbours(point):
+                        if anotherNei not in self.clues or nei not in self.unvisited or anotherNei == nei:
+                            continue
+                        C = self.clues[anotherNei]['neighbours']
+                        numC = self.clues[anotherNei]['number']
+                        lenOfMinesC = len(self.clues[anotherNei]['mines'])
+                        if (numA - lenOfMinesA) == (numB - lenOfMinesB) + (numC - lenOfMinesC):
+                            A_B_C = A - B - C
+                            for p in A_B_C:
+                                if p in self.unvisited:
+                                    print('According to', point, 'and', nei, 'and', anotherNei, 'I am sure that', p,
+                                          'is safe')
+                                    self.safe.add(p)
 
     def updateNeighbours(self, point):
         '''

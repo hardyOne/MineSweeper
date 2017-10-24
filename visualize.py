@@ -19,11 +19,11 @@ class App(QWidget):
         # to set map
         self.row = 20
         self.col = 20
-        self.p = 0.15
-        self.mineNo = int(self.row * self.col * self.p)
-        map = Map(self.row, self.col, self.mineNo)
+        self.p = 0.20
+        map = Map(self.row, self.col, self.p)
         # create a user
         self.user = User(map.randomGenerate())
+        # self.user = User(map.loadMap('mapOutput.txt'))
         # set button width and height
         self.maxSize = 600
         self.buttonWidth = self.maxSize // max(self.row, self.col)
@@ -178,9 +178,11 @@ class App(QWidget):
             button.setStyleSheet('background-color:red')
 
     def reset(self):
-        self.p = random() / 10 + 0.1
-        map = Map(self.row, self.col, int(self.row * self.col * self.p))
+        self.p = random() / 10 + 0.2
+        self.p =  0.2
+        map = Map(self.row, self.col, self.p)
         self.user = User(map.randomGenerate())
+        # self.user = User(map.loadMap('mapOutput.txt'))
         self.finished = False
         self.simulateClick = False
         for i in range(0, self.row):
