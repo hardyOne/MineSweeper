@@ -1,6 +1,7 @@
 from agent import Agent
 from time import sleep
 from generateMap import Map
+from random import random
 
 
 class User:
@@ -15,6 +16,8 @@ class User:
             for j in range(self.col):
                 if map[i][j] == 9:
                     self.mines.add((i, j))
+        # Let the agent know how many mines there are in the map
+        self.agent.numberOfMinesFromUser = len(self.mines)
 
     def result(self, point):
         x, y = point
@@ -37,7 +40,12 @@ class User:
             print('you have detected',len(self.agent.mines.intersection(self.mines)),' mines rightly, but you have marked', self.agent.mines-self.mines,'as mine wrongly')
             return 'FAILURE'
         # update agent's clues
-        self.agent.updateClues(point, self.map[x][y])
+        # But I don't want to give the agent the clue number
+        p = random()
+        if p <= 0.95:
+            self.agent.updateClues(point, self.map[x][y])
+        else:
+            print('You clicked point',point, ',but I do not want to tell you the clue number.')
 
     def play(self):
         while True:
@@ -48,6 +56,6 @@ class User:
                 break
 
 # unit test
-# map = Map(20,20,0.15)
-# user = User(map.randomGenerate())
-# user.play()
+map = Map(30,30,0.10)
+user = User(map.randomGenerate())
+user.play()
