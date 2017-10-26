@@ -42,7 +42,7 @@ class User:
         # update agent's clues
         # But I don't want to give the agent the clue number
         p = random()
-        if p <= 0.95:
+        if p <= 1:
             self.agent.updateClues(point, self.map[x][y])
         else:
             print('You clicked point',point, ',but I do not want to tell you the clue number.')
@@ -56,6 +56,6 @@ class User:
                 break
 
 # unit test
-map = Map(30,30,0.10)
+map = Map(30,30,0.15)
 user = User(map.randomGenerate())
 user.play()

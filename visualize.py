@@ -180,7 +180,7 @@ class App(QWidget):
     def reset(self):
         print('------------------A new game----------------------------')
         self.p = random() / 10 + 0.2
-        self.p =  0.20
+        self.p =  0.10
         map = Map(self.row, self.col, self.p)
         self.user = User(map.randomGenerate())
         # self.user = User(map.loadMap('mapOutput.txt'))

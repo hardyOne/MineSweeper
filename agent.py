@@ -1,5 +1,7 @@
 from random import randint
-from itertools import permutations
+from itertools import combinations
+import math
+import copy
 
 
 class Agent:
@@ -130,7 +132,7 @@ class Agent:
                         flag = False
                         break
                 if flag:
-                    print('%.3f' % visitedPercentage, listUnvisited[rNum])
+                    print('%.3f' % visitedPercentage, ': Randomly click',listUnvisited[rNum])
                     return listUnvisited[rNum]
 
                     # but if we can't find this type of point in given times?
@@ -296,10 +298,14 @@ class Agent:
                                     # this function is used when: 1, the agent know the total number of mines. 2, the undetected squares is limited
                                     # 3, No safe squares left.
     def inferAtLast(self):
-        if self.numberOfMinesFromUser == None or len(self.unvisited) > 15 or len(self.unvisited) == 0:
+        if self.numberOfMinesFromUser == None or len(self.unvisited) > 20 or len(self.unvisited) == 0:
             return
-        print('Yes, because only',self.numberOfMinesFromUser - len(self.mines),'I know total number of mines, so I choose to infer!')
+        f = math.factorial
+        nCr = lambda n,r: f(n) / f(r) / f(n - r)
         lenOfMinesLeft = self.numberOfMinesFromUser - len(self.mines)
+        if nCr(len(self.unvisited),lenOfMinesLeft) > 50:
+            return
+        print('Yes, because only',self.numberOfMinesFromUser - len(self.mines),'mines left. And I know total number of mines, so I choose to infer!')
         # if number of undetected squares is equal to number of mines left
         if lenOfMinesLeft == len(self.unvisited):
             print('all left squares are mine')
@@ -316,10 +322,17 @@ class Agent:
             # back up clues
             cp_clues = dict(self.clues)
             listOfUnvisited = list(self.unvisited)
-            initial = [True if i < lenOfMinesLeft else False for i in range(len(listOfUnvisited))]
-            for assignment in permutations(initial):
+            print(listOfUnvisited)
+            for temp in combinations(range(len(listOfUnvisited)),lenOfMinesLeft):
+                assignment = [False for i in range(len(self.unvisited))]
+                for indice in temp:
+                    assignment[indice] = True
                 mineSet = [listOfUnvisited[i] for i in range(len(self.unvisited)) if assignment[i] == True]
                 safeSet = [listOfUnvisited[i] for i in range(len(self.unvisited)) if assignment[i] == False]
+                print('Combinations:',temp)
+                print('Squares Left:',len(self.unvisited))
+                print('Assignment:',assignment)
+                print('MineSet:',mineSet)
                 isValid = True
                 for mine in mineSet:
                     for nei in self.allNeighbours(mine):
@@ -327,26 +340,26 @@ class Agent:
                             self.clues[nei]['neighbours'].discard(mine)
                             self.clues[nei]['mines'].add(mine)
                 for safeSquare in safeSet:
-                    for nei in self.allNeighbours(mine):
+                    for nei in self.allNeighbours(safeSquare):
                         if nei in self.clues and nei in self.visited:
-                            self.clues[nei]['neighbours'].discard(mine)
+                            self.clues[nei]['neighbours'].discard(safeSquare)
                 # check if there is a conflict
                 for point in self.unvisited:
                     for nei in self.allNeighbours(point):
-                        if nei not in self.clues or nei in self.unvisited:
+                        if nei not in self.clues or nei in self.unvisited or nei in self.mines:
                             continue
                         # Assignment is invalid
                         num = self.clues[nei]['number']
-                        neiNum = len(self.clues[nei]['neighbours'])
                         mineNum = len(self.clues[nei]['mines'])
-                        if num < mineNum or num > neiNum + mineNum:
+                        if num < mineNum or num >  mineNum:
+                            print(point,'neighbour',nei,'conflict',num,mineNum)
                             isValid = False
                             break
                     if not isValid:
                         break
                 if not isValid:
-                    self.clues = dict(cp_clues)
-                    break
+                    self.clues = copy.deepcopy(cp_clues)
+                    continue
                 # mark mines and add safe squares
                 print('This is a true assignment!')
                 for safeSquare in safeSet:
@@ -354,7 +367,7 @@ class Agent:
                 for mine in mineSet:
                     self.mark(mine)
                 # find one valid permutation, the agent will stop
-                return
+                break
 
     def updateNeighbours(self, point):
         '''
