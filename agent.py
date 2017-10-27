@@ -2,6 +2,9 @@ from random import randint
 from itertools import combinations
 import math
 import copy
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 
 class Agent:
@@ -37,18 +40,17 @@ class Agent:
         # know the number of mines or not
         self.numberOfMinesFromUser = None
 
-
     def mark(self, point):
         # point is in mines
         if point in self.mines:
             return
         self.sequence.append(point)
-        print('mark', point, 'as a mine', len(self.mines))
         # add this point to mines and visited set
         self.mines.add(point)
         self.visited.add(point)
         # delete this point in unvisited
         self.unvisited.discard(point)
+        logging.debug('mark {} as a mine, now there are {} mines.'.format(point, len(self.mines)))
         for nei in self.allNeighbours(point):
             if nei not in self.clues:
                 continue
@@ -67,7 +69,7 @@ class Agent:
         # exist safe squares
         if len(self.safe) != 0:
             self.rule56 = False
-            point  = self.safe.pop()
+            point = self.safe.pop()
             self.sequence.append(point)
             return point
         # no safe squares left
@@ -90,7 +92,6 @@ class Agent:
             self.sequence.append(point)
             return point
 
-
         # If we know the total number of mines, try another time
         self.inferAtLast()
 
@@ -98,8 +99,6 @@ class Agent:
             point = self.safe.pop()
             self.sequence.append(point)
             return point
-
-
 
         # no safe squares. oops!!
         rPoint = self.randomOperation()
@@ -132,7 +131,7 @@ class Agent:
                         flag = False
                         break
                 if flag:
-                    print('%.3f' % visitedPercentage, ': Randomly click',listUnvisited[rNum])
+                    logging.debug('{:.2f} Randomly click {}'.format(visitedPercentage,listUnvisited[rNum]))
                     return listUnvisited[rNum]
 
                     # but if we can't find this type of point in given times?
@@ -158,7 +157,7 @@ class Agent:
                     pri = count
                     nextMark = point
             if nextMark != None:
-                print('Uncertain: Through sound analysis, I decide mark', nextMark, 'as a mine')
+                logging.debug('Uncertain: Through sound analysis, I decide mark {} as a mine'.format(nextMark))
                 self.mark(nextMark)
                 # try another time
                 return self.nextClick()
@@ -170,7 +169,7 @@ class Agent:
         if len(listUnvisited) == 0:
             return (-1, -1)  # this point is meaningless
         rNum = randint(0, len(listUnvisited) - 1)
-        print('Finally rendomly generated', listUnvisited[rNum])
+        logging.debug('Finally rendomly generated {}'.format(listUnvisited[rNum]))
         return listUnvisited[rNum]
 
     def updateClues(self, point, number=None):
@@ -192,7 +191,7 @@ class Agent:
         # case 1: this point's number = len(mines)
         # all its left neighbours are safe clues, add them to safe set
         if number == lenOfMines:
-            # print('number == lenOfMines', point)
+            # logging.debug('number == lenOfMines', point)
             for nei in self.allNeighbours(point):
                 if nei in self.clues and nei in self.unvisited:
                     # add nei to safe set
@@ -204,7 +203,7 @@ class Agent:
         # case 2: this point's number = undetected neighbours + detected mines
         # mark its all neighbours as mines
         elif number == lenOfNeis + lenOfMines:
-            print('number == lenOfNeis + lenOfMines', point)
+            logging.debug('number == lenOfNeis + lenOfMines {}'.format(point))
             for nei in self.allNeighbours(point):
                 if nei in self.visited:
                     continue
@@ -214,9 +213,9 @@ class Agent:
             self.clues.pop(point)
         # case special: 1-2-1
         elif number == 1:
-            x,y = point
-            neiA = x,y+1
-            neiB = x,y+2
+            x, y = point
+            neiA = x, y + 1
+            neiB = x, y + 2
             # make sure the neiA and neiB are valid clue
             condition1 = neiA not in self.clues or neiB not in self.clues or neiA not in self.visited or neiB not in self.visited
             if condition1:
@@ -224,8 +223,9 @@ class Agent:
             # make sure the number of neiA is 2 and neiB is 1
             condition2 = self.clues[neiA]['number'] == 2 and self.clues[neiB]['number'] == 1
             if condition2:
-                print('special situation: 1-2-1', point, neiA, neiB)
-                candidates = [(x-1,y-1),(x,y-1),(x+1,y-1),(x-1,y+1),(x+1,y+1),(x-1,y+3),(x,y+3),(x+1,y+3)]
+                logging.debug('special situation: 1-2-1 {} {} {}'.format(point, neiA, neiB))
+                candidates = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1), (x - 1, y + 1), (x + 1, y + 1),
+                              (x - 1, y + 3), (x, y + 3), (x + 1, y + 3)]
                 for candidate in candidates:
                     if candidate in self.unvisited:
                         self.safe.add(candidate)
@@ -249,18 +249,19 @@ class Agent:
                 if numA - lenOfMinesA > numB - lenOfMinesB and len(A_B) == (numA - lenOfMinesA) - (
                             numB - lenOfMinesB):
                     for p in A_B:
-                        print('According to', point, 'and', nei, 'I am sure that', p, 'as a mine')
+                        logging.debug('According to {} and {} I am sure that {} is a mine'.format(point, nei, p))
                         self.mark(p)
                 # case 4: A contains B and A(num) - A(mines) = B(num) - B(mine)
-                elif (numA - lenOfMinesA) == (numB - lenOfMinesB) and A >= B :
+                elif (numA - lenOfMinesA) == (numB - lenOfMinesB) and A >= B:
                     for p in A_B:
                         if p in self.unvisited:
-                            print('According to', point, 'and', nei, 'I am sure that', p, 'is safe')
+                            logging.debug('According to {} and {} I am sure that  {} is safe'.format(point, nei, p))
                             self.safe.add(p)
                 # case 5 and 6: involves 3 clue squares
-                elif self.rule56 and (numA - lenOfMinesA) > (numB - lenOfMinesB) and len(A&B) != 0:
+                elif self.rule56 and (numA - lenOfMinesA) > (numB - lenOfMinesB) and len(A & B) != 0:
                     for anotherNei in self.extenedAllNeighbours(point):
-                        if anotherNei not in self.clues or nei in self.unvisited or anotherNei == nei or len(A&self.clues[anotherNei]['neighbours']) == 0:
+                        if anotherNei not in self.clues or nei in self.unvisited or anotherNei == nei or len(
+                                        A & self.clues[anotherNei]['neighbours']) == 0:
                             continue
                         C = self.clues[anotherNei]['neighbours']
                         numC = self.clues[anotherNei]['number']
@@ -271,9 +272,9 @@ class Agent:
                         lenOfContributedMines = None
                         if C >= B:
                             lenOfContributedMines = numC - lenOfMinesC
-                        elif B>= C:
+                        elif B >= C:
                             lenOfContributedMines = numB - lenOfMinesB
-                        elif len(B&C) == 0:
+                        elif len(B & C) == 0:
                             lenOfContributedMines = (numB - lenOfMinesB) + (numC - lenOfMinesC)
                         if lenOfContributedMines == None:
                             continue
@@ -281,58 +282,60 @@ class Agent:
                             A_B_C = A - B - C
                             for p in A_B_C:
                                 if p in self.unvisited:
-                                    print('According to', point, 'and', nei, 'and', anotherNei, 'I am sure that', p,
-                                          'is safe')
+                                    logging.debug(
+                                        'According to {} and {} and {} I am sure that  {} is safe'.format(point, nei,anotherNei, p))
                                     self.safe.add(p)
                         # case 6: logic same as case 5, but involve 4 squares
-                        if (numA - lenOfMinesA) - lenOfContributedMines == len(A - B - C) and len(A&B) != 0:
+                        if (numA - lenOfMinesA) - lenOfContributedMines == len(A - B - C) and len(A & B) != 0:
                             A_B_C = A - B - C
                             for p in A_B_C:
                                 if p in self.unvisited:
-                                    print('According to', point, 'and', nei, 'and', anotherNei,
-                                          'I am sure that', p,
-                                          'is a mine')
+                                    logging.debug(
+                                        'According to {} and {} and {}I am sure that  {} is a mine'.format(point, nei, anotherNei,p))
                                     self.mark(p)
 
 
                                     # this function is used when: 1, the agent know the total number of mines. 2, the undetected squares is limited
                                     # 3, No safe squares left.
+
     def inferAtLast(self):
         if self.numberOfMinesFromUser == None or len(self.unvisited) > 20 or len(self.unvisited) == 0:
             return
-        f = math.factorial
-        nCr = lambda n,r: f(n) / f(r) / f(n - r)
         lenOfMinesLeft = self.numberOfMinesFromUser - len(self.mines)
-        if nCr(len(self.unvisited),lenOfMinesLeft) > 50:
-            return
-        print('Yes, because only',self.numberOfMinesFromUser - len(self.mines),'mines left. And I know total number of mines, so I choose to infer!')
         # if number of undetected squares is equal to number of mines left
         if lenOfMinesLeft == len(self.unvisited):
-            print('all left squares are mine')
-            for finalMine in self.unvisited:
+            logging.debug('all left squares are mine')
+            for finalMine in set(self.unvisited):
                 self.mark(finalMine)
+            return
         # if no mines left
         if lenOfMinesLeft == 0:
-            print('all left squares are safe')
+            logging.debug('all left squares are safe')
             for p in self.unvisited:
-                print('infer:',p,'is safe!')
+                logging.debug('infer: {} is safe!'.format(p))
                 self.safe.add(p)
+            return
         # else, we enumerate all possible combinations and check if it's valid
         else:
+            f = math.factorial
+            nCr = lambda n, r: f(n) / f(r) / f(n - r)
+            if nCr(len(self.unvisited), lenOfMinesLeft) > 50:
+                return
+            logging.debug('Yes, because only {} mines left. And I know total number of mines, so I choose to enumerate!'.format(self.numberOfMinesFromUser - len(self.mines)))
             # back up clues
             cp_clues = dict(self.clues)
             listOfUnvisited = list(self.unvisited)
-            print(listOfUnvisited)
-            for temp in combinations(range(len(listOfUnvisited)),lenOfMinesLeft):
+            logging.debug(listOfUnvisited)
+            for temp in combinations(range(len(listOfUnvisited)), lenOfMinesLeft):
                 assignment = [False for i in range(len(self.unvisited))]
                 for indice in temp:
                     assignment[indice] = True
                 mineSet = [listOfUnvisited[i] for i in range(len(self.unvisited)) if assignment[i] == True]
                 safeSet = [listOfUnvisited[i] for i in range(len(self.unvisited)) if assignment[i] == False]
-                print('Combinations:',temp)
-                print('Squares Left:',len(self.unvisited))
-                print('Assignment:',assignment)
-                print('MineSet:',mineSet)
+                logging.debug('Combinations: {}'.format(temp))
+                logging.debug('Squares Left: {}'.format(len(self.unvisited)))
+                logging.debug('Assignment: {}'.format(assignment))
+                logging.debug('MineSet: {}'.format(mineSet))
                 isValid = True
                 for mine in mineSet:
                     for nei in self.allNeighbours(mine):
@@ -351,8 +354,8 @@ class Agent:
                         # Assignment is invalid
                         num = self.clues[nei]['number']
                         mineNum = len(self.clues[nei]['mines'])
-                        if num < mineNum or num >  mineNum:
-                            print(point,'neighbour',nei,'conflict',num,mineNum)
+                        if num < mineNum or num > mineNum:
+                            logging.debug( '{} nei {} has a conflict: nei = {}, but mineNum = {}'.format(point,nei,num,mineNum))
                             isValid = False
                             break
                     if not isValid:
@@ -361,7 +364,7 @@ class Agent:
                     self.clues = copy.deepcopy(cp_clues)
                     continue
                 # mark mines and add safe squares
-                print('This is a true assignment!')
+                logging.debug('This is a true assignment!')
                 for safeSquare in safeSet:
                     self.safe.add(safeSquare)
                 for mine in mineSet:

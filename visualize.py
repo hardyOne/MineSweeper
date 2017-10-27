@@ -7,6 +7,8 @@ from generateMap import Map
 from time import sleep
 import win32api, win32con
 from random import random
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 
 class App(QWidget):
@@ -178,9 +180,9 @@ class App(QWidget):
             button.setStyleSheet('background-color:red')
 
     def reset(self):
-        print('------------------A new game----------------------------')
+        logging.info('------------------A new game----------------------------')
         self.p = random() / 10 + 0.2
-        self.p =  0.10
+        self.p =  0.20
         map = Map(self.row, self.col, self.p)
         self.user = User(map.randomGenerate())
         # self.user = User(map.loadMap('mapOutput.txt'))

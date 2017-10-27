@@ -2,6 +2,8 @@ from agent import Agent
 from time import sleep
 from generateMap import Map
 from random import random
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 class User:
@@ -24,20 +26,20 @@ class User:
         # terminate conditions
         # case 1: have detected all squares and has marked all the mines correctly
         if len(self.agent.visited) == self.row * self.col and self.mines == self.agent.mines:
-            print('You have detected all squares! Congratulations!')
-            print('you have detected', len(self.agent.mines), ' mines')
-            print('mines:', self.agent.mines)
+            logging.debug('You have detected all squares! Congratulations!')
+            logging.debug('you have detected  mines'.format(len(self.agent.mines)))
+            logging.debug('mines: {}'.format( self.agent.mines))
             return 'SUCCESS'
         # case 1: have detected all squares but not mark all the mines correctly
         if len(self.agent.visited) == self.row * self.col and self.mines != self.agent.mines:
-            print('you have walked', len(self.agent.visited), 'steps')
-            print('you have detected',len(self.agent.mines.intersection(self.mines)),' mines rightly, but you have marked', self.agent.mines-self.mines,'as mine wrongly')
+            logging.debug('you have walked {} steps'.format(len(self.agent.visited)))
+            # logging.debug('you have detected {} mines rightly, but you have marked {} as mine wrongly'.format(len(self.agent.mines.intersection(self.mines))),len(self.agent.mines-self.mines))
             return 'FAILURE'
         # case 2: click the mine => failure
         if self.map[x][y] == 9:
-            print(point, ' is a mine')
-            print('you have walked', len(self.agent.visited), 'steps')
-            print('you have detected',len(self.agent.mines.intersection(self.mines)),' mines rightly, but you have marked', self.agent.mines-self.mines,'as mine wrongly')
+            logging.debug('{} is a mine'.format(point))
+            logging.debug('you have walked {} steps'.format(len(self.agent.visited)))
+            logging.debug('you have detected {} mines rightly, but you have marked {} as mine wrongly'.format(len(self.agent.mines.intersection(self.mines)),self.agent.mines-self.mines))
             return 'FAILURE'
         # update agent's clues
         # But I don't want to give the agent the clue number
@@ -45,17 +47,29 @@ class User:
         if p <= 1:
             self.agent.updateClues(point, self.map[x][y])
         else:
-            print('You clicked point',point, ',but I do not want to tell you the clue number.')
+            logging.debug('You clicked point {},but I do not want to tell you the clue number.'.format(point))
 
     def play(self):
         while True:
             point = self.agent.nextClick()
             res = self.result(point)
             if res == 'SUCCESS' or res == 'FAILURE':
-                print(res)
-                break
+                logging.debug(res)
+                return res
 
 # unit test
-map = Map(30,30,0.15)
-user = User(map.randomGenerate())
-user.play()
+count = 0
+total = 0
+while True:
+    map = Map(20,20,0.15)
+    user = User(map.randomGenerate())
+    res = user.play()
+    if user.map[user.agent.sequence[0][0]][user.agent.sequence[0][1]] == 0:
+        total += 1
+        if(res == 'SUCCESS'):
+            count += 1
+    if total >= 100:
+        break
+logging.info('success rate: {}'.format(count/total))
+
+
