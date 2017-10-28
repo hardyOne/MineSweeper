@@ -76,21 +76,21 @@ class Agent:
         # to get useful information(mines or safe squares)
         for p in dict(self.clues):
             self.updateClues(p)
-        # try another times to see if there exists a safe square
-        if len(self.safe) != 0:
-            point = self.safe.pop()
-            self.sequence.append(point)
-            return point
+            # try another times to see if there exists a safe square
+            if len(self.safe) != 0:
+                point = self.safe.pop()
+                self.sequence.append(point)
+                return point
 
-        # try not to use rule 5 and 6 because it's time-consuming, but we have no choice
+        # the agent should try not to use rule 5 and 6 because it's time-consuming, but it has no choice
         self.rule56 = True
         for p in dict(self.clues):
             self.updateClues(p)
-        # try another times to see if there exists a safe square
-        if len(self.safe) != 0:
-            point = self.safe.pop()
-            self.sequence.append(point)
-            return point
+            # try another times to see if there exists a safe square
+            if len(self.safe) != 0:
+                point = self.safe.pop()
+                self.sequence.append(point)
+                return point
 
         # If we know the total number of mines, try another time
         self.inferAtLast()
