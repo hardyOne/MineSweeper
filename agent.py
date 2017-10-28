@@ -76,21 +76,21 @@ class Agent:
         # to get useful information(mines or safe squares)
         for p in dict(self.clues):
             self.updateClues(p)
-            # try another times to see if there exists a safe square
-            if len(self.safe) != 0:
-                point = self.safe.pop()
-                self.sequence.append(point)
-                return point
+        # try another times to see if there exists a safe square
+        if len(self.safe) != 0:
+            point = self.safe.pop()
+            self.sequence.append(point)
+            return point
 
         # the agent should try not to use rule 5 and 6 because it's time-consuming, but it has no choice
         self.rule56 = True
         for p in dict(self.clues):
             self.updateClues(p)
-            # try another times to see if there exists a safe square
-            if len(self.safe) != 0:
-                point = self.safe.pop()
-                self.sequence.append(point)
-                return point
+        # try another times to see if there exists a safe square
+        if len(self.safe) != 0:
+            point = self.safe.pop()
+            self.sequence.append(point)
+            return point
 
         # If we know the total number of mines, try another time
         self.inferAtLast()
@@ -266,7 +266,7 @@ class Agent:
                         C = self.clues[anotherNei]['neighbours']
                         numC = self.clues[anotherNei]['number']
                         lenOfMinesC = len(self.clues[anotherNei]['mines'])
-                        # case 5: logic same as case 4, but involve 4 squares
+                        # case 5: logic same as case 4, but involve 3 squares
                         # how many mines in A or C are also in C
                         # if B is in C
                         lenOfContributedMines = None
@@ -285,7 +285,7 @@ class Agent:
                                     logging.debug(
                                         'According to {} and {} and {} I am sure that  {} is safe'.format(point, nei,anotherNei, p))
                                     self.safe.add(p)
-                        # case 6: logic same as case 5, but involve 4 squares
+                        # case 6: logic same as case 5, but involve 3 squares
                         if (numA - lenOfMinesA) - lenOfContributedMines == len(A - B - C) and len(A & B) != 0:
                             A_B_C = A - B - C
                             for p in A_B_C:
@@ -295,9 +295,8 @@ class Agent:
                                     self.mark(p)
 
 
-                                    # this function is used when: 1, the agent know the total number of mines. 2, the undetected squares is limited
-                                    # 3, No safe squares left.
-
+    # this function is used when: 1, the agent know the total number of mines. 2, the undetected squares is limited
+    # 3, No safe squares left.
     def inferAtLast(self):
         if self.numberOfMinesFromUser == None or len(self.unvisited) > 20 or len(self.unvisited) == 0:
             return

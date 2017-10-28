@@ -61,7 +61,7 @@ class User:
 count = 0
 total = 0
 while True:
-    map = Map(50,50,0.10)
+    map = Map(50,50,0.20)
     user = User(map.randomGenerate())
     res = user.play()
     # if calculate general success rate, the line below can be commented
@@ -69,7 +69,7 @@ while True:
         total += 1
         if(res == 'SUCCESS'):
             count += 1
-    if total >= 200:
+    if total >= 1000:
         break
 logging.info('success rate: {}'.format(count/total))
 
