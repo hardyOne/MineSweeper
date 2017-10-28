@@ -319,6 +319,9 @@ class Agent:
         else:
             f = math.factorial
             nCr = lambda n, r: f(n) / f(r) / f(n - r)
+            # avoid calculating negative values' factorial
+            if lenOfMinesLeft < 0 or lenOfMinesLeft > len(self.unvisited):
+                return
             if nCr(len(self.unvisited), lenOfMinesLeft) > 50:
                 return
             logging.debug('Yes, because only {} mines left. And I know total number of mines, so I choose to enumerate!'.format(self.numberOfMinesFromUser - len(self.mines)))
